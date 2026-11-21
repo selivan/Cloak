@@ -339,11 +339,13 @@ func TestLocalManager_ListAllUsers(t *testing.T) {
 		users = append(users, newUser)
 		wg.Add(1)
 		go func() {
+			defer wg.Done()
+
 			err := mgr.WriteUserInfo(newUser)
 			if err != nil {
-				t.Fatal(err)
+				t.Error(err)
+				return
 			}
-			wg.Done()
 		}()
 	}
 	wg.Wait()
@@ -351,6 +353,7 @@ func TestLocalManager_ListAllUsers(t *testing.T) {
 	listedUsers, err := mgr.ListAllUsers()
 	if err != nil {
 		t.Error(err)
+		return
 	}
 
 	sort.Slice(users, func(i, j int) bool {
